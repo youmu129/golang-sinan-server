@@ -16,7 +16,7 @@ type IndexModel struct {
 	Id          int    `json:"id"`
 	Title       string `json:"title"`
 	Url         string `json:"url"`
-	Icon        string `json:"icon"`
+	LogoUrl     string `json:"logo_url"`
 	Description string `json:"description"`
 }
 
@@ -40,7 +40,7 @@ func (s *IndexService) Init() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         url TEXT NOT NULL,
-        icon TEXT,
+        logo_url TEXT,
         description TEXT
     );
     `
@@ -66,7 +66,7 @@ func (s *IndexService) GetIndex(request *restful.Request, response *restful.Resp
 	var list IndexList
 	for rows.Next() {
 		var model IndexModel
-		err = rows.Scan(&model.Id, &model.Title, &model.Url, &model.Icon,
+		err = rows.Scan(&model.Id, &model.Title, &model.Url, &model.LogoUrl,
 			&model.Description)
 		if err != nil {
 			log.Fatal(err)
@@ -89,7 +89,7 @@ func (s *IndexService) PostIndex(request *restful.Request, response *restful.Res
 	}
 
 	sqlInsert := `
-    INSERT INTO sinan_index(title, url, icon, description) VALIES(?, ?, ?)
+    INSERT INTO sinan_index(title, url, logo_url, description) VALUES(?, ?, ?, ?)
     `
 	stmt, err := s.db.Prepare(sqlInsert)
 	if err != nil {
@@ -100,7 +100,7 @@ func (s *IndexService) PostIndex(request *restful.Request, response *restful.Res
 
 	for _, model := range list.Models {
 		_, err := stmt.Exec(model.Title, model.Url,
-			model.Icon, model.Description)
+			model.LogoUrl, model.Description)
 		if err != nil {
 			log.Fatal(err)
 			response.WriteError(500, err)
